@@ -1,6 +1,6 @@
 FROM alpine:3
 
-LABEL maintainer="sanjusss sanjusss@qq.com"
+LABEL maintainer="hsingyun iakext@gmail.com"
 
 ENV HTTP_PORT=80
 ENV EXTERNAL_PORT=80
@@ -27,7 +27,7 @@ ADD conf /app/conf
 RUN echo '*/15 * * * * /app/updatebttracker.sh' > /etc/crontabs/root
 CMD /app/run.sh
 HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 CMD /app/healthcheck.sh
-#RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 RUN apk add --no-cache \
     aria2 \
@@ -42,13 +42,13 @@ RUN apk add --no-cache \
 RUN groupadd -o -g 1000 aria2 \
     && useradd -o -g 1000 -u 1000 aria2
 
-RUN ARIAGN_VERSION=`curl --silent "https://api.github.com/repos/mayswind/AriaNg/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'` \
-    && mkdir -p /run/nginx \
+ADD AriaNg.zip /app/AriaNg.zip
+
+RUN mkdir -p /run/nginx \
     && mkdir -p /usr/share/nginx/html \
     && rm -rf /usr/share/nginx/html/* \
-    && wget -N --no-check-certificate https://github.com/mayswind/AriaNg/releases/download/${ARIAGN_VERSION}/AriaNg-${ARIAGN_VERSION}.zip \
-    && unzip AriaNg-${ARIAGN_VERSION}.zip -d /usr/share/nginx/html \
-    && rm -rf AriaNg-${ARIAGN_VERSION}.zip \
+    && unzip AriaNg.zip -d /usr/share/nginx/html \
+    && rm -rf AriaNg.zip \
     && echo Set disable_coredump false >> /etc/sudo.conf
 
 RUN apk del \
